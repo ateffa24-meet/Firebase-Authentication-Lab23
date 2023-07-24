@@ -10,22 +10,31 @@ config = {
   "storageBucket": "atef-f7669.appspot.com",
   "messagingSenderId": "570090090631",
   "appId": "1:570090090631:web:e519920dab366562074822",
-  "measurementId": "G-47Z8DV47VK"
+  "measurementId": "G-47Z8DV47VK",
+  "databaseURL":""
     }
+
+firebase = pyrebase.initialize_app(config)
+auth = firebase.auth()
+
+app = Flask(__name__, template_folder='templates', static_folder='static')
 
 app = Flask(__name__, template_folder='templates', static_folder='static')
 app.config['SECRET_KEY'] = 'super-secret-key'
 
 
-@app.route('/signin', methods=['GET', 'POST'])
+@app.route('/', methods=['GET', 'POST'])
 def signin():
-    if request.methods=='post':
+    if request.method=='post':
         email=request.form['email']
-        password = request.form['password']
+        password=request.form['password']
         try:
-            login_session['user'] = auth.creat_user_with_email_and_password(email, password)
+            login_session['user'] = auth.sign_in_with_email_and_password(email, password)   
+            return render_template("add_tweet.html")
         except:
             return render_template("signin.html")
+    else:
+        return render_template("signin.html")
 
     
 
@@ -33,13 +42,16 @@ def signin():
 @app.route('/signup', methods=['GET', 'POST'])
 def signup():
     error=""
-    if request.methods== 'POST':
+    if request.method== 'POST':
         email=request.form['email']
         password = request.form['password']
         try:
-            login_session['user'] = auth.creat_user_with_email_and_password(email, password)
+            login_session['user'] = auth.create_user_with_email_and_password(email, password)
+            return render_template("add_tweet.html")
         except:
             return render_template("signup.html")
+    else:
+        return render_template("signup.html") 
 
 
 
